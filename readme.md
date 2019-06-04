@@ -8,9 +8,9 @@ A FP style curried vector calculation lib.
 **Installation**
 
 ```shell
-npm install –-save-dev vector-math-fp
+npm install vector-math-fp
 # or
-yarn add -D vector-math-fp
+yarn add vector-math-fp
 ```
 
 **Usage**
