@@ -1,1 +1,107 @@
-"use strict";function _interopDefault(e){return e&&"object"==typeof e&&"default"in e?e.default:e}Object.defineProperty(exports,"__esModule",{value:!0});var fp=require("lodash/fp"),approxFix=_interopDefault(require("approx-fix"));const _math=fp.curry((e,r,t)=>fp.zipWith(e,t,r)),_arrToObj=fp.curry((e,r)=>e.reduce((e,t,a)=>(e[t]=r[a]||0,e),{})),_objToArr=fp.curry((e,r)=>e.map(e=>r[e]||0)),_radianToDegree=e=>180*e/Math.PI,_degreeToRadian=e=>e/180*Math.PI,_formatAngle=e=>180==Math.abs(e%360)?180:(e%360+540)%360-180,_minus=_math(fp.subtract),_add=_math(fp.add),_times=_math(fp.multiply),_divide=_math(fp.divide),_dot=fp.curry((e,r)=>e[0]*r[0]+e[1]*r[1]),_cross=fp.curry((e,r)=>e[0]*r[1]-r[0]*e[1]),_lenOf=fp.pipe([fp.map(e=>Math.pow(e,2)),fp.sum,Math.sqrt]),_areaOf=e=>fp.multiply(...e),_ratioOf=([e,r])=>r?e/r:NaN,_angleBetween=fp.curry((e,r)=>{let t=_lenOf(e)*_lenOf(r);if(0==t)return 0;let a=_dot(e,r)/t;return a=Math.min(a,1),approxFix(_radianToDegree(Math.acos(a)*(_cross(e,r)<0?-1:1)))}),_angleOf=_angleBetween([1,0]),_vectorCase={"-90":[0,-1],0:[1,0],90:[0,1],180:[-1,0]},_vectorOf=e=>{let r;return e=_formatAngle(e),_vectorCase[e]||(r=_degreeToRadian(e),[Math.cos(r),Math.sin(r)])},_rotateRaw=(e,r)=>{e=e||0;let t=_lenOf(r);if(0==t)return r;const a=_degreeToRadian(e);let o=r[0]/t,_=r[1]/t,p=Math.cos(a),n=Math.sin(a);return[(o*p-_*n)*t,(_*p+o*n)*t].map(approxFix)},_rotate=fp.curry(_rotateRaw),_unRotate=fp.curry((e,r)=>_rotateRaw(-e,r));exports.add=_add,exports.angleBetween=_angleBetween,exports.angleOf=_angleOf,exports.areaOf=_areaOf,exports.arrToObj=_arrToObj,exports.cross=_cross,exports.degreeToRadian=_degreeToRadian,exports.divide=_divide,exports.dot=_dot,exports.formatAngle=_formatAngle,exports.lenOf=_lenOf,exports.math=_math,exports.minus=_minus,exports.objToArr=_objToArr,exports.radianToDegree=_radianToDegree,exports.ratioOf=_ratioOf,exports.rotate=_rotate,exports.times=_times,exports.unRotate=_unRotate,exports.vectorOf=_vectorOf;
+'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
+
+var fp = require('lodash/fp');
+var approxFix = _interopDefault(require('approx-fix'));
+
+// e.g.:
+// _math(divide)(v1)(v2) => v2 / 1v
+// _rotate(angle)(v) => v ~
+// _math(divide)([1, 2])([4, 6]) => [4, 3]
+
+// * -------------------------------- tools
+
+// * support Array and Object
+const _math = fp.curry((fn, v2, v1) =>
+    Array.isArray(v1) ? fp.zipWith(fn, v1, v2) : fp.mergeWith(fn, fp.cloneDeep(v1), v2),
+);
+
+const _arrToObj = fp.curry((keys, arr) => keys.reduce((o, k, i) => ((o[k] = arr[i] || 0), o), {}));
+const _objToArr = fp.curry((keys, obj) => keys.map(k => obj[k] || 0));
+const _radianToDegree = n => (n * 180) / Math.PI;
+const _degreeToRadian = n => (n / 180) * Math.PI;
+const _formatAngle = angle =>
+    Math.abs(angle % 360) == 180 ? 180 : (((angle % 360) + 540) % 360) - 180;
+
+// * ---------------- simple math
+
+const _minus = _math(fp.subtract);
+const _add = _math(fp.add);
+const _times = _math(fp.multiply);
+const _divide = _math(fp.divide);
+const _dot = fp.curry((v1, v2) => v1[0] * v2[0] + v1[1] * v2[1]); // == * cos(tha)
+const _cross = fp.curry((v1, v2) => v1[0] * v2[1] - v2[0] * v1[1]); // == * sin(tha)
+
+// * ---------------- vector property
+
+const _lenOf = fp.pipe([fp.map(e => Math.pow(e, 2)), fp.sum, Math.sqrt]);
+const _areaOf = v => fp.multiply(...v);
+const _ratioOf = ([x, y]) => (!y ? NaN : x / y); // 16:9 => 16 / 9
+
+// * -------------------------------- rotate and angle
+
+const _angleBetween = fp.curry((v1, v2) => {
+    let s = _lenOf(v1) * _lenOf(v2);
+    if (s == 0) return 0;
+
+    let r = _dot(v1, v2) / s;
+    r = Math.min(r, 1);
+    return approxFix(_radianToDegree(Math.acos(r) * (_cross(v1, v2) < 0 ? -1 : 1)));
+});
+
+const _angleOf = _angleBetween([1, 0]);
+
+const _vectorCase = {
+    '-90': [0, -1],
+    0: [1, 0],
+    90: [0, 1],
+    180: [-1, 0],
+};
+
+const _vectorOf = angle => {
+    angle = _formatAngle(angle);
+    let radian;
+    return (
+        _vectorCase[angle] ||
+        ((radian = _degreeToRadian(angle)), [Math.cos(radian), Math.sin(radian)])
+    );
+};
+
+const _rotateRaw = (angle, v) => {
+    angle = angle || 0;
+    let c = _lenOf(v);
+    if (c == 0) return v;
+
+    const radian = _degreeToRadian(angle);
+    let cos1 = v[0] / c,
+        sin1 = v[1] / c,
+        cos2 = Math.cos(radian),
+        sin2 = Math.sin(radian);
+    return [(cos1 * cos2 - sin1 * sin2) * c, (sin1 * cos2 + cos1 * sin2) * c].map(approxFix);
+};
+const _rotate = fp.curry(_rotateRaw);
+const _unRotate = fp.curry((angle, v) => _rotateRaw(-angle, v));
+
+exports.add = _add;
+exports.angleBetween = _angleBetween;
+exports.angleOf = _angleOf;
+exports.areaOf = _areaOf;
+exports.arrToObj = _arrToObj;
+exports.cross = _cross;
+exports.degreeToRadian = _degreeToRadian;
+exports.divide = _divide;
+exports.dot = _dot;
+exports.formatAngle = _formatAngle;
+exports.lenOf = _lenOf;
+exports.math = _math;
+exports.minus = _minus;
+exports.objToArr = _objToArr;
+exports.radianToDegree = _radianToDegree;
+exports.ratioOf = _ratioOf;
+exports.rotate = _rotate;
+exports.times = _times;
+exports.unRotate = _unRotate;
+exports.vectorOf = _vectorOf;

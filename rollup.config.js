@@ -12,7 +12,7 @@ const config = {
             format: 'esm',
         },
     ],
-    plugins: [terser()],
+    // plugins: [terser()],
 };
 
 export default config;

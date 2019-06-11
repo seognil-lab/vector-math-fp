@@ -80,6 +80,14 @@ Rotate only support 2d vector
     -   rotate `(Angle, v1) => v2`
     -   unRotate `(Angle, v1) => v2 // === rotate(-Angle, v1)`
 
+**Notice**
+
+`minus add times divide` support object directly calculation.
+
+```javascript
+minus({ x: 2, y: 7 }, { x: 3, y: 9 }); // => { x: 1, y: 2 }
+```
+
 ---
 
 ## ⌨️ Contribution
