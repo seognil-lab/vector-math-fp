@@ -1,4 +1,16 @@
-import { add, curry, divide, map, multiply, pipe, subtract, sum, zipWith } from 'lodash/fp';
+import {
+    add,
+    curry,
+    divide,
+    map,
+    multiply,
+    pipe,
+    subtract,
+    sum,
+    zipWith,
+    mergeWith,
+    cloneDeep,
+} from 'lodash/fp';
 
 import approxFix from 'approx-fix';
 
@@ -9,7 +21,10 @@ import approxFix from 'approx-fix';
 
 // * -------------------------------- tools
 
-const _math = curry((fn, v2, v1) => zipWith(fn, v1, v2));
+// * support Array and Object
+const _math = curry((fn, v2, v1) =>
+    Array.isArray(v1) ? zipWith(fn, v1, v2) : mergeWith(fn, cloneDeep(v1), v2),
+);
 
 const _arrToObj = curry((keys, arr) => keys.reduce((o, k, i) => ((o[k] = arr[i] || 0), o), {}));
 const _objToArr = curry((keys, obj) => keys.map(k => obj[k] || 0));

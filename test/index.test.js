@@ -81,6 +81,22 @@ describe('simple math', () => {
     });
 });
 
+describe('simple math obj', () => {
+    it('minus add times divide', () => {
+        checkEqual(minus({ x: 2, y: 7 }, { x: 3, y: 9 }), { x: 1, y: 2 });
+        checkEqual(add({ x: 2, y: 3 }, { x: 4, y: 5 }), { x: 6, y: 8 });
+        checkEqual(times({ x: 2, y: 5 }, { x: 3, y: 7 }), { x: 6, y: 35 });
+        checkEqual(divide({ x: 2, y: 5 }, { x: 3, y: 15 }), { x: 1.5, y: 3 });
+    });
+
+    it('fp, minus add times divide', () => {
+        checkEqual(minus({ x: 2, y: 7 })({ x: 3, y: 9 }), { x: 1, y: 2 });
+        checkEqual(add({ x: 2, y: 3 })({ x: 4, y: 5 }), { x: 6, y: 8 });
+        checkEqual(times({ x: 2, y: 5 })({ x: 3, y: 7 }), { x: 6, y: 35 });
+        checkEqual(divide({ x: 2, y: 5 })({ x: 3, y: 15 }), { x: 1.5, y: 3 });
+    });
+});
+
 describe('verctor property', () => {
     it('lenOf areaOf ratioOf', () => {
         checkEqual(lenOf([3, 4]), 5);
