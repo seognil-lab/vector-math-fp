@@ -1,4 +1,5 @@
-# # blacklist all
-# **
-# # include whitelist
-# !dist/**
+# blacklist all
+**
+# include whitelist
+!dist/**
+!src/**

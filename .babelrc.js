@@ -1,4 +1,4 @@
 module.exports = {
-    // * parsing 'import' for jest
-    presets: [['@babel/preset-env', { targets: { node: 'current' } }]],
+    // * parsing for cjs
+    presets: ['@babel/preset-env'],
 };

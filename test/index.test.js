@@ -22,7 +22,7 @@ const {
     vectorOf,
     rotate,
     unRotate,
-} = require('../dist/index.cjs');
+} = require('../dist');
 
 // * --------------------------------
 
@@ -220,8 +220,8 @@ describe('360 degree batch test, vector rotate/dot/cross', () => {
 
     const vector1 = [1, 0];
 
-    const inOneRange = e => -1 <= e && e <= 1;
-    const inAngleRange = angle => -180 < angle && angle <= 180;
+    const inOneRange = e => e >= -1 && e <= 1;
+    const inAngleRange = angle => angle > -180 && angle <= 180;
 
     const inVectorRange = arr => arr.every(inOneRange);
 
@@ -242,7 +242,7 @@ describe('360 degree batch test, vector rotate/dot/cross', () => {
 
         const errorIndex = arr.findIndex((...args) => !fn(...args));
         assert(
-            errorIndex == -1,
+            errorIndex === -1,
             `
             error index：${errorIndex}s
             error value：${arr[errorIndex]}
